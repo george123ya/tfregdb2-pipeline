@@ -17,6 +17,7 @@ Writes `public/mock/secondary/{uniprot}.json` of shape `{"ss": "HHCCC..."}`.
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -29,7 +30,7 @@ PDB_DIR = PUBLIC / "pdb"
 OUT_DIR = PUBLIC / "mock" / "secondary"
 # mkdssp from the conda env (bioconda's dssp 4.x); Bio.PDB.DSSP accepts
 # either an absolute path or a bare command name.
-MKDSSP_BIN = "/home/goguxor/miniconda3/envs/mpratree_app_env/bin/mkdssp"
+MKDSSP_BIN = os.environ.get("MKDSSP_BIN", "mkdssp")
 
 # DSSP 8-state → 3-state collapse.
 SS_MAP = {

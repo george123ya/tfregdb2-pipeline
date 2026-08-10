@@ -22,8 +22,8 @@ Output: public/mock/paddle/{uniprot}.json — packed float array length L,
 2-decimal Z-scores. [symbol].astro renders it as a track alongside ADpred.
 
 Run from repo root:
-    PADDLE_DIR=/home/goguxor/Desktop/PADDLE \
-      /home/goguxor/miniconda3/envs/adpred/bin/python scripts/extract_paddle.py
+    PADDLE_DIR=~/Desktop/PADDLE \
+      python scripts/extract_paddle.py
 Test one: PADDLE_ONLY=TP53 ... scripts/extract_paddle.py
 """
 
@@ -41,7 +41,7 @@ os.environ.setdefault("CUDA_VISIBLE_DEVICES", "-1")  # CPU — tiny CNN, dodges 
 import numpy as np  # noqa: E402
 import tensorflow as tf  # noqa: E402
 
-PADDLE_DIR = Path(os.environ.get("PADDLE_DIR", "/home/goguxor/Desktop/PADDLE"))
+PADDLE_DIR = Path(os.environ.get("PADDLE_DIR", os.path.expanduser("~/Desktop/PADDLE")))
 TFS_DIR = Path("public/mock/tfs")
 OUT_DIR = Path("public/mock/paddle")
 AAS = list("ACDEFGHIKLMNPQRSTVWY")

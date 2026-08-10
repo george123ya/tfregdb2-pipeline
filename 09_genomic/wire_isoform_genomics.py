@@ -34,24 +34,35 @@ import pandas as pd
 
 
 # Paths
-ROOT = "/home/goguxor/Desktop/tfregdb2"
+ROOT = os.environ.get("TFREGDB2_ROOT", os.path.expanduser("~/Desktop/tfregdb2"))
 TFS_DIR = os.path.join(ROOT, "public/mock/tfs")
 # prot2exon was renamed to fastCDS (Jun 2026) — repo and binary both moved.
-# The old path is kept as a fallback so an unmigrated checkout still works.
+# Both binaries are env-overridable and default to the bare command name so
+# they resolve via PATH; the legacy prot2exon is kept as a fallback so an
+# unmigrated checkout still works.
+FASTCDS_BIN = os.environ.get("FASTCDS_BIN", "fastCDS")
+LEGACY_PROT2EXON_BIN = os.environ.get("PROT2EXON_BIN", "prot2exon")
 PROT2EXON_BIN = next(
-    (p for p in (
-        "/home/goguxor/Desktop/fastCDS/build/fastCDS",
-        "/home/goguxor/Desktop/protein2genomic/build/prot2exon",
-    ) if os.path.exists(p)),
-    "/home/goguxor/Desktop/fastCDS/build/fastCDS",
+    (p for p in (FASTCDS_BIN, LEGACY_PROT2EXON_BIN) if os.path.exists(p)),
+    FASTCDS_BIN,
 )
-P2E_OUT_BASE = "/home/goguxor/Desktop/tfregdb_source/prot2exon"
+P2E_OUT_BASE = os.environ.get(
+    "P2E_OUT_BASE", os.path.expanduser("~/Desktop/tfregdb_source/prot2exon")
+)
 INDEX = os.path.join(P2E_OUT_BASE, "human_primary.idx")
 COMBINED_BED = os.path.join(P2E_OUT_BASE, "combined_with_isoforms.bed")
 RESULTS_DIR = os.path.join(P2E_OUT_BASE, "results_isoforms")
-EXISTING_BED = "/home/goguxor/Desktop/tfregdb/data_pipeline/Unified_Effector_Domains.bed"
-COMPLETE_IDS_XLSX = "/home/goguxor/Desktop/tfregdb_source/tables/TF_completeIDs.xlsx"
-CACHE_DIR = "/home/goguxor/Desktop/tfregdb_source/.cache"
+EXISTING_BED = os.environ.get(
+    "EFFECTOR_BED",
+    os.path.expanduser("~/Desktop/tfregdb/data_pipeline/Unified_Effector_Domains.bed"),
+)
+COMPLETE_IDS_XLSX = os.environ.get(
+    "COMPLETE_IDS_XLSX",
+    os.path.expanduser("~/Desktop/tfregdb_source/tables/TF_completeIDs.xlsx"),
+)
+CACHE_DIR = os.environ.get(
+    "CACHE_DIR", os.path.expanduser("~/Desktop/tfregdb_source/.cache")
+)
 os.makedirs(CACHE_DIR, exist_ok=True)
 
 

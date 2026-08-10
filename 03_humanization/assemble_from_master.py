@@ -11,11 +11,11 @@ The master workbook already contains every BLAST projection done upstream:
 
 We keep only rows that successfully projected onto a human canonical
 (Final_Human_UNIPROT_ID present + non-failure Mapping_Status), normalize
-column names to the schema build_tf_mocks.py expects, and tag each row's
+column names to the schema build_tf_records.py expects, and tag each row's
 Source_Database with the fine-grained study label (Provenance) — this is
 what makes SOURCE_TYPE_HINT lookups resolve downstream.
 
-Output columns required by build_tf_mocks.py:
+Output columns required by build_tf_records.py:
     Final_Human_UNIPROT_ID, Final_Human_DomainCoords, Final_Human_ENSP_ID,
     Final_Human_Domain_Sequence, Final_Identity, Mapping_Status,
     Original_Gene, Source_Database, PUBMED_ID,
@@ -72,12 +72,12 @@ def _from_studies(sd: pd.DataFrame) -> pd.DataFrame:
     # legacy fine-grained labels that SOURCE_TYPE_HINT keys off.
     df["Source_Database"] = df["Provenance"].astype(str)
     df["Original_Gene"] = df["Original_Gene"].map(_normalize_gene)
-    # Studies have no PMID per row — leave blank; build_tf_mocks falls back to
+    # Studies have no PMID per row — leave blank; build_tf_records falls back to
     # PAPER_TITLE_FALLBACK for the study-paper titles.
     df["PUBMED_ID"] = ""
     # Studies don't carry the curator's free-form DomainCoordinates; the
     # human-frame coords are the only ones — use them under DomainCoordinates so
-    # the coord-based effector-type lookup in build_tf_mocks finds them.
+    # the coord-based effector-type lookup in build_tf_records finds them.
     df["DomainCoordinates"] = df["Final_Human_DomainCoords"]
     df["DomainType"] = df["Domain type"]
     return df

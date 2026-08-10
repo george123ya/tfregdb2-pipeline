@@ -201,7 +201,13 @@ def _slice_one_chrom(
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--prot2exon", type=Path,
-                    default=Path("/home/goguxor/Desktop/tfregdb_source/prot2exon/results_isoforms/isoform_structure.tsv"))
+                    default=Path(os.environ.get(
+                        "P2E_ISOFORM_TSV",
+                        os.path.expanduser(
+                            "~/Desktop/tfregdb_source/prot2exon/"
+                            "results_isoforms/isoform_structure.tsv"
+                        ),
+                    )))
     ap.add_argument("--mock-dir", type=Path, default=Path("public/mock/tfs"))
     ap.add_argument("--work-dir", type=Path, default=Path("data/variants/gnomad_work"))
     ap.add_argument("--out", type=Path, default=Path("data/variants/gnomad.tsv"))

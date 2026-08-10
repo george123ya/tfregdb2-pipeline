@@ -28,7 +28,7 @@ def obtain_uniprot_id(ensembl_id):
         return None
 
 # --- Archivos ---
-input_csv = "/home/edgardo/Documentos/string_TF_NEW.csv"
+input_csv = os.environ.get("STRING_TF_CSV", "string_TF_NEW.csv")
 output_csv = "TF_Uniprot_NEW.csv"
 cache_file = "ensembl_to_uniprot.pkl"
 

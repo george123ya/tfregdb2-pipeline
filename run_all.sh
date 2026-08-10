@@ -16,7 +16,7 @@ echo "04/05 projection - isoform dataset + project domains + CIS-BP DBDs"
 #   python 05_projection/map_canonical_to_isoforms.py
 
 echo "13 assemble      - build per-TF records from the projected tables"
-#   python 13_assemble/build_tf_mocks.py
+#   python 13_assemble/build_tf_records.py
 
 echo "-- annotation branches (independent; feed the per-TF records) --"
 echo "06 structure     - HPC folding + local pLDDT/PAE/secondary  (see scc/README.md)"

@@ -7,7 +7,7 @@ Pipeline:
      boundary-codon partitioning (each AA owned by exactly one CDS) so
      variants on the codon junction don't end up double-counted.
   2. Resolve canonical ENSP per gene (Ensembl canonical → APPRIS PRINCIPAL:1
-     → longest), matching build_tf_mocks's chain.
+     → longest), matching build_tf_records's chain.
   3. For each TF with a canonical ENSP + a per-TF JSON in public/mock/tfs:
        a. Query SQLite for variants in any of the canonical's CDS genomic
           ranges (chrom + pos BETWEEN g_start AND g_end).
@@ -125,7 +125,7 @@ def _parse_prot2exon(p2x_tsv: Path) -> dict[str, EnspMap]:
 
 
 def _resolve_canonical(ids_csv: Path) -> tuple[dict[str, str], dict[str, list[str]]]:
-    """Match build_tf_mocks's canonical picker. Returns (gene→canonical ENSP,
+    """Match build_tf_records's canonical picker. Returns (gene→canonical ENSP,
     gene→list of alt ENSPs)."""
     print(f"[2/4] reading TF_completeIDs {ids_csv}...")
     ids = pd.read_csv(ids_csv)
@@ -305,9 +305,21 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--db", type=Path, default=Path("data/variants/variants.sqlite"))
     ap.add_argument("--ids-csv", type=Path,
-                    default=Path("/home/goguxor/Desktop/tfregdb/data_pipeline/blast_table/TF_completeIDs_with_ensembl_canonical.csv"))
+                    default=Path(os.environ.get(
+                        "COMPLETE_IDS_CSV",
+                        os.path.expanduser(
+                            "~/Desktop/tfregdb/data_pipeline/blast_table/"
+                            "TF_completeIDs_with_ensembl_canonical.csv"
+                        ),
+                    )))
     ap.add_argument("--prot2exon", type=Path,
-                    default=Path("/home/goguxor/Desktop/tfregdb_source/prot2exon/results_isoforms/isoform_structure.tsv"))
+                    default=Path(os.environ.get(
+                        "P2E_ISOFORM_TSV",
+                        os.path.expanduser(
+                            "~/Desktop/tfregdb_source/prot2exon/"
+                            "results_isoforms/isoform_structure.tsv"
+                        ),
+                    )))
     ap.add_argument("--mock-dir", type=Path,
                     default=Path("public/mock/tfs"))
     ap.add_argument("--out-dir", type=Path,
@@ -326,7 +338,7 @@ def main() -> int:
     con.row_factory = sqlite3.Row
     cur = con.cursor()
 
-    # Iterate TFs that have a per-TF JSON in mock/tfs/ (i.e. that build_tf_mocks
+    # Iterate TFs that have a per-TF JSON in mock/tfs/ (i.e. that build_tf_records
     # produced) so we don't try to write variants for symbols the rest of the
     # build skipped.
     tf_files = sorted(args.mock_dir.glob("*.json"))
@@ -475,7 +487,7 @@ def main() -> int:
                 # Surface the original AA letter from canonical seq for the
                 # SNV case so the side panel shows e.g. "R175?" instead of
                 # "?175?". TF JSON's `sequence` is the Ensembl-canonical AA
-                # string (set in build_tf_mocks.py). Skip for iso-only
+                # string (set in build_tf_records.py). Skip for iso-only
                 # variants (no canonical aa_pos to index into).
                 if cons == "missense" and aa_pos is not None:
                     canon_seq = str(tf.get("sequence") or "")

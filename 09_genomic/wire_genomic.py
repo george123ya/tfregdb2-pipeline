@@ -41,8 +41,13 @@ from collections import defaultdict
 from typing import Optional
 
 
-PROT2EXON_RESULTS = "/home/goguxor/Desktop/tfregdb_source/prot2exon/results"
-TFS_DIR = "/home/goguxor/Desktop/tfregdb2/public/mock/tfs"
+PROT2EXON_RESULTS = os.environ.get(
+    "PROT2EXON_RESULTS",
+    os.path.expanduser("~/Desktop/tfregdb_source/prot2exon/results"),
+)
+TFS_DIR = os.environ.get(
+    "TFS_DIR", os.path.expanduser("~/Desktop/tfregdb2/public/mock/tfs")
+)
 
 FEATURE_TYPE_NORMALIZE = {
     "five_prime_UTR": "5utr",

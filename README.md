@@ -1,6 +1,6 @@
-# TFRegDB 2.0 pipeline
+# TFRegDB v2.0 pipeline
 
-The curation and annotation pipeline behind TFRegDB 2.0, a database of human
+The curation and annotation pipeline behind TFRegDB v2.0, a database of human
 transcription factor effector domains (activation, repression, bifunctional)
 with structural, evolutionary, sequence, and variant annotation.
 

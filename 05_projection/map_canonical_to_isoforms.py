@@ -19,7 +19,7 @@ the equivalent iso-frame coords. Two paths:
      the alignment goes into `alignment_identity`.
 
 Output schema matches the legacy `TF_effector_data_with_derivadas_and_alignment_ideal.csv`
-so build_tf_mocks can swap it in via SRC_EFFECTOR_CSV — but only the columns
+so build_tf_records can swap it in via SRC_EFFECTOR_CSV — but only the columns
 the build actually reads downstream:
     Gene name (HGNC), Translation ID, Source, Domain_origin,
     From, To, alignment_identity, alignment_coverage.
@@ -242,7 +242,7 @@ def main() -> int:
     ids = ids[ids["Translation_Clean"].str.startswith("ENSP", na=False)].copy()
 
     # Pick canonical ENSP per gene: Ensembl canonical → APPRIS PRINCIPAL:1 →
-    # PRINCIPAL → longest. Match build_tf_mocks's chain.
+    # PRINCIPAL → longest. Match build_tf_records's chain.
     canon_ensp: dict[str, str] = {}
     ensp_seq: dict[str, str] = {}
     ensp_gene: dict[str, str] = {}
@@ -292,7 +292,7 @@ def main() -> int:
     u = pd.read_excel(args.unified)
     u = u[u["Final_Human_UNIPROT_ID"].notna()].copy()
     # Re-bin every row under the canonical HGNC gene that owns its UniProt —
-    # same logic as build_tf_mocks. This moves the TEAD1-misrouted "TEF" rows
+    # same logic as build_tf_records. This moves the TEAD1-misrouted "TEF" rows
     # (Original_Gene=TEF, UniProt=P28347) onto TEAD1 where the projection
     # actually landed, so the canonical→iso mapping doesn't propagate the
     # curator's gene-name error into 7+ iso rows per misrouted entry.
@@ -433,7 +433,7 @@ def main() -> int:
 
 
 def _normalize_for_lookup(g) -> str:
-    """Strip _HUMAN suffix + upper-case (matches build_tf_mocks normalisation)."""
+    """Strip _HUMAN suffix + upper-case (matches build_tf_records normalisation)."""
     s = str(g or "").strip().upper()
     if s.endswith("_HUMAN"):
         s = s[: -len("_HUMAN")]

@@ -23,7 +23,7 @@ Output: data/variants/gnomad_introns.tsv
     symbol, chrom, pos, ref, alt, af, ac, an, popmax_af
 
 Run from repo root (env with pysam):
-    /home/goguxor/miniconda3/envs/adpred/bin/python \
+    python \
       scripts/variants/fetch_gnomad_introns.py
 """
 

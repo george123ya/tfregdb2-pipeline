@@ -34,6 +34,7 @@ from __future__ import annotations
 import argparse
 import csv
 import gzip
+import os
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -126,7 +127,13 @@ def main() -> int:
                           "Default picks up both Genome- and Targeted-"
                           "ScreensMutant files dropped under data/variants/source/."))
     ap.add_argument("--prot2exon", type=Path,
-                    default=Path("/home/goguxor/Desktop/tfregdb_source/prot2exon/results_isoforms/isoform_structure.tsv"))
+                    default=Path(os.environ.get(
+                        "P2E_ISOFORM_TSV",
+                        os.path.expanduser(
+                            "~/Desktop/tfregdb_source/prot2exon/"
+                            "results_isoforms/isoform_structure.tsv"
+                        ),
+                    )))
     ap.add_argument("--mock-dir", type=Path, default=Path("public/mock/tfs"))
     ap.add_argument("--out", type=Path, default=Path("data/variants/cosmic.tsv"))
     args = ap.parse_args()

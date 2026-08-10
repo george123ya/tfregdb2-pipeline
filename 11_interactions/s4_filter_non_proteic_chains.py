@@ -1,9 +1,9 @@
 import os
 
 # Carpeta de entrada con archivos PDB originales
-input_folder = "/home/edgardo/Documentos/pdb_NEW_files"
+input_folder = os.environ.get("PDB_DIR", "pdb_files")
 # Carpeta de salida para guardar archivos PDB filtrados
-output_folder = "/home/edgardo/Documentos/pdb_NEW_files_filtered"
+output_folder = os.environ.get("PDB_FILTERED_DIR", "pdb_files_filtered")
 
 # Crear carpeta de salida si no existe
 os.makedirs(output_folder, exist_ok=True)

@@ -7,7 +7,7 @@ per-isoform PTMs are a *peptide-context presence* mapping (the modification site
 exists in the isoform), NOT an isoform-specific observation. We surface them on
 the PTM track with that framing.
 
-The canonical PTMs are already baked into tfs/{symbol}.json by build_tf_mocks
+The canonical PTMs are already baked into tfs/{symbol}.json by build_tf_records
 (canonical translation bucket). This emits the SAME record shape for every
 NON-canonical isoform, keyed by isoform NAME so the PTM track can fetch
 mock/ptms/{isoformName}.json on isoform selection (matching the
@@ -17,7 +17,7 @@ Output: public/mock/ptms/{isoformName}.json
     [{ "pos", "type", "residue", "pmid"? }, ...]   (same as tfs ptms[])
 
 Run from repo root (env with pandas+openpyxl):
-    /home/goguxor/miniconda3/envs/adpred/bin/python scripts/extract_ptms_isoform.py
+    python scripts/extract_ptms_isoform.py
 """
 
 from __future__ import annotations
@@ -31,7 +31,7 @@ REPO = Path(__file__).resolve().parent.parent
 SRC_PTMS = REPO.parent / "tfregdb_source" / "tables" / "PTM_aggregated.xlsx"
 OUT_DIR = REPO / "public" / "mock" / "ptms"
 
-# Same map build_tf_mocks uses; anything else is dropped.
+# Same map build_tf_records uses; anything else is dropped.
 PTM_TYPE_MAP = {
     "Phosphorylation": "Phospho",
     "Dephosphorylation": "Phospho",

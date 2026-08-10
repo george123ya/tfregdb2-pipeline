@@ -20,10 +20,10 @@ Then it regenerates public/mock/index.json (home table rollups) from whatever
 TF JSONs live under public/mock/tfs/ at the end.
 
 Usage:
-  python3 scripts/build_tf_mocks.py                  # full build (~1.2k TFs)
-  python3 scripts/build_tf_mocks.py --limit 20       # fast iteration
-  python3 scripts/build_tf_mocks.py --symbols TP53,MYC,SP1
-  python3 scripts/build_tf_mocks.py --skip-pae       # skip the slow PAE step
+  python3 scripts/build_tf_records.py                  # full build (~1.2k TFs)
+  python3 scripts/build_tf_records.py --limit 20       # fast iteration
+  python3 scripts/build_tf_records.py --symbols TP53,MYC,SP1
+  python3 scripts/build_tf_records.py --skip-pae       # skip the slow PAE step
 """
 from __future__ import annotations
 
@@ -40,14 +40,20 @@ import pandas as pd
 
 # ---------------------------------------------------------------------- paths
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SRC = "/home/goguxor/Desktop/tfregdb_source"
+SRC = os.environ.get("TFREGDB_SOURCE", os.path.expanduser("~/Desktop/tfregdb_source"))
 
 SRC_UNIFIED = os.path.join(SRC, "tables", "Unified_Valid_Domains.xlsx")
 SRC_PTMS = os.path.join(SRC, "tables", "PTM_aggregated.xlsx")
 # New canonical map is the BLAST-table CSV which carries the `Ensembl canonical`
 # column. The old xlsx is kept as the fallback when the CSV isn't present, but
 # the gene-name-keyed canonical picker reads from this file first.
-SRC_IDS_CSV = "/home/goguxor/Desktop/tfregdb/data_pipeline/blast_table/TF_completeIDs_with_ensembl_canonical.csv"
+SRC_IDS_CSV = os.environ.get(
+    "COMPLETE_IDS_CSV",
+    os.path.expanduser(
+        "~/Desktop/tfregdb/data_pipeline/blast_table/"
+        "TF_completeIDs_with_ensembl_canonical.csv"
+    ),
+)
 SRC_IDS = os.path.join(SRC, "tables", "TF_completeIDs.xlsx")
 SRC_DBD = os.path.join(SRC, "tables", "TF_dbd_data_.xlsx")
 # Per-isoform effector domains with SW-alignment quality (one row per
@@ -629,7 +635,9 @@ def build(args):
     # Hoja 1 has PMID + Title for ~3137 unique papers — the literature
     # backbone that HumanizedTable was curated from. Use it to enrich the
     # per-TF papers list with real titles.
-    raw_xlsx = "/home/goguxor/Desktop/tfregdb/dev/UpdatedTable.xlsx"
+    raw_xlsx = os.environ.get(
+        "RAW_XLSX", os.path.expanduser("~/Desktop/tfregdb/dev/UpdatedTable.xlsx")
+    )
     pmid_titles: dict[str, str] = {}
     try:
         # We cache by xlsx mtime, just like the other tables.
@@ -930,13 +938,13 @@ def build(args):
                 ai = r.get("alignment_identity")
                 ac = r.get("alignment_coverage")
                 # A sequence-aligned transfer is accepted as present only at
-                # full (100%) identity over >=95% coverage of the domain;
+                # full (100%) identity and full (100%) coverage of the domain;
                 # otherwise the isoform is treated as not carrying it.
                 if not (
                     pd.notna(ai)
                     and pd.notna(ac)
                     and float(ai) >= 99.999
-                    and float(ac) >= 95.0
+                    and float(ac) >= 99.999
                 ):
                     continue
                 entry["identity"] = round(float(ai), 1)

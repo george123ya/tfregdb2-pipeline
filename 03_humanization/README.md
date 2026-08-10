@@ -6,7 +6,7 @@ domain coordinate onto the canonical human Ensembl protein via BLASTp.
 
 The output is the `Unified_Valid_Domains.xlsx` schema downstream consumers
 need — specifically the `Final_Human_UNIPROT_ID`, `Final_Human_DomainCoords`,
-and `Final_Human_Domain_Sequence` columns that `build_tf_mocks.py` reads.
+and `Final_Human_Domain_Sequence` columns that `build_tf_records.py` reads.
 
 This replaces the exploratory `curate_table.ipynb` notebook with a scripted
 flow you can run end-to-end and version.

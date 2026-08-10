@@ -31,7 +31,7 @@ import openpyxl, json, os, re, csv, sys, unicodedata
 from collections import Counter, defaultdict
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-XLSX = os.environ.get("RECUR_XLSX", "/home/goguxor/Downloads/UpdatedTable.xlsx")
+XLSX = os.environ.get("RECUR_XLSX", os.path.expanduser("~/Downloads/UpdatedTable.xlsx"))
 TFDIR = os.path.join(ROOT, "public/mock/tfs")
 INDEX = os.path.join(ROOT, "public/mock/index.json")
 OVERLAY = os.path.join(ROOT, "data_pipeline/recuration_overlay.json")

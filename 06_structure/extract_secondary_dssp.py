@@ -8,12 +8,12 @@ shape/3-state mapping as scripts/extract_secondary.py. CIFs are streamed to a
 temp file and deleted; only the small SS JSON is kept. Resumable (skips existing).
 
 Run with the conda base python (urllib only):
-    /home/goguxor/miniconda3/bin/python scripts/extract_secondary_dssp.py
+    python scripts/extract_secondary_dssp.py
 """
 import json, glob, os, subprocess, sys, tempfile, urllib.request, time
 import concurrent.futures as cf
 
-MKDSSP = "/home/goguxor/miniconda3/envs/ss-dssp/bin/mkdssp"
+MKDSSP = os.environ.get("MKDSSP_BIN", "mkdssp")
 OUT_DIR = "public/mock/secondary"
 SS_MAP = {"H": "H", "G": "H", "I": "H", "E": "E", "B": "E",
           "T": "C", "S": "C", " ": "C", "-": "C", "P": "C", "": "C"}

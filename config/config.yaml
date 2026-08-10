@@ -23,8 +23,9 @@ thresholds:
                             # not currently enforce a coverage gate - see stage 03)
 
   # Isoform projection: carry a canonical domain onto each alternative isoform.
+  # A domain is present on an isoform only at full identity and full coverage.
   isoform_identity: 100     # percent
-  isoform_coverage: 95      # percent; planned change to 100 for the final version
+  isoform_coverage: 100     # percent
 
 curation:
   # OpenAI model snapshot used for article triage and extraction (stage 01).

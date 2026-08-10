@@ -15,7 +15,7 @@ TFRegDB1):
   5. Write back the source row + the new Final_* columns.
 
 The output is one combined `Unified_Valid_Domains.xlsx` with a stable column
-schema downstream readers (build_tf_mocks.py) already consume.
+schema downstream readers (build_tf_records.py) already consume.
 """
 
 from __future__ import annotations
@@ -137,7 +137,7 @@ def main() -> int:
         s_start = int(h["sstart"])
         s_end = int(h["send"])
         coords = f"{s_start}-{s_end}"
-        # Legacy-pipeline column aliases — downstream build_tf_mocks.py reads
+        # Legacy-pipeline column aliases — downstream build_tf_records.py reads
         # `Original_Gene`, `Source_Database`, and `PUBMED_ID`. We map them from
         # whichever source table this row came from so the schema is stable.
         src = str(r.get("__source__") or "")

@@ -4,7 +4,7 @@ Pulls (UniProt, Transcript ID, Translation ID, Protein length, Isoform name)
 per row and attaches a Transcript[] cross-link (ENST → iso name) to each
 public/mock/tfs/{SYMBOL}.json. Lets the variant projector match COSMIC's
 per-transcript rows to isoforms without re-running the full
-build_tf_mocks pipeline.
+build_tf_records pipeline.
 
 Idempotent — re-running just overwrites the field.
 """
@@ -12,13 +12,20 @@ Idempotent — re-running just overwrites the field.
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 
 import pandas as pd
 
 
-IDS_CSV = Path("/home/goguxor/Desktop/tfregdb/data_pipeline/blast_table/TF_completeIDs_with_ensembl_canonical.csv")
+IDS_CSV = Path(os.environ.get(
+    "COMPLETE_IDS_CSV",
+    os.path.expanduser(
+        "~/Desktop/tfregdb/data_pipeline/blast_table/"
+        "TF_completeIDs_with_ensembl_canonical.csv"
+    ),
+))
 TFS_DIR = Path("public/mock/tfs")
 
 
