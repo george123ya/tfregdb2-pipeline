@@ -31,7 +31,7 @@ if [ ! -d public/mock/tfs ]; then
   : "${PUBLIC_DATA_BASE:?build data missing and PUBLIC_DATA_BASE unset}"
   echo "== fetching build_data.tar.gz from ${PUBLIC_DATA_BASE} =="
   curl -fsSL "${PUBLIC_DATA_BASE%/}/build_data.tar.gz" -o /tmp/build_data.tar.gz
-  tar xzf /tmp/build_data.tar.gz   # extracts public/mock/{tfs,…} + public/interactions
+  tar xzf /tmp/build_data.tar.gz   # extracts public/mock/{tfs, slims, secondary, ...}
   echo "   extracted: $(find public/mock/tfs -type f | wc -l) TF files"
 fi
 
@@ -39,7 +39,7 @@ npm run build
 
 echo "== stripping off-host data from dist/ =="
 # Served from R2 at runtime:
-rm -rf dist/pae dist/pdb dist/conservation dist/interactions
+rm -rf dist/pae dist/pdb dist/conservation
 rm -rf dist/mock/conway dist/mock/plddt dist/mock/secondary dist/mock/structures dist/mock/variants
 # Build-only (already inlined into HTML — never fetched at runtime):
 rm -rf dist/mock/tfs dist/mock/slims dist/mock/adpred dist/mock/index dist/mock/index.json

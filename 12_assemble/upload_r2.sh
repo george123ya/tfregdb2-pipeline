@@ -28,17 +28,13 @@ python3 scripts/build_api_index.py || echo "  (skipped — variant data not pres
 echo "== building bulk download files =="
 python3 scripts/build_downloads.py || echo "  (skipped — source data not present)"
 
-# 1) Build-input tarball — exactly the dirs the build reads via fs (mock/{index,
-#    tfs,slims,secondary,plddt,adpred} + stats_constraint.json + interactions
-#    menu, excluding scores/).
+# 1) Build-input tarball: the dirs the build reads from disk (mock/{index, tfs,
+#    slims, secondary, plddt, adpred, paddle} + stats_constraint.json).
 echo "== building build_data.tar.gz =="
 tar czf /tmp/build_data.tar.gz \
-  --exclude='public/interactions/scores' \
-  --exclude='public/interactions/scores2d' \
   public/mock/index.json public/mock/tfs public/mock/slims \
   public/mock/secondary public/mock/plddt public/mock/adpred public/mock/paddle \
-  public/mock/stats_constraint.json \
-  public/interactions
+  public/mock/stats_constraint.json
 echo "   $(du -h /tmp/build_data.tar.gz | cut -f1)"
 
 # 2) Runtime data the client fetches via dataUrl() (PUBLIC_DATA_BASE + path).
@@ -54,18 +50,10 @@ echo "   $(du -h /tmp/build_data.tar.gz | cut -f1)"
 #   by the protein phyloP overlay in SequenceText. mock/paddle: per-isoform
 #   PADDLE (none yet — canonical is baked into the build tarball; listed so the
 #   _index/canonical objects exist on R2 for future per-iso files).
-RUNTIME=(conservation interactions pae pdb mock/conway mock/conway_genomic mock/plddt mock/secondary mock/structures mock/variants mock/adpred mock/paddle mock/ptms mock/slims mock/api mock/tfs downloads)
+RUNTIME=(conservation pae pdb mock/conway mock/conway_genomic mock/plddt mock/secondary mock/structures mock/variants mock/adpred mock/paddle mock/ptms mock/slims mock/api mock/tfs downloads)
 for d in "${RUNTIME[@]}"; do
-  EXTRA=""
-  # The ε intermaps (interactions/scores2d/, ~86k files) and the legacy
-  # scores/ dir live ONLY on R2 — they're produced on the SCC and uploaded
-  # separately, never staged into local public/. `rclone sync` MIRRORS the
-  # destination, so without this exclude it would DELETE them from R2.
-  if [ "$d" = "interactions" ]; then
-    EXTRA="--exclude=scores2d/** --exclude=scores/**"
-  fi
   echo "== sync public/$d -> $DEST/$d =="
-  rclone sync "public/$d" "$DEST/$d" $FLAGS $EXTRA
+  rclone sync "public/$d" "$DEST/$d" $FLAGS
 done
 
 echo "== upload build_data.tar.gz -> $DEST/ =="
