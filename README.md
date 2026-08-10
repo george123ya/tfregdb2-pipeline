@@ -23,15 +23,14 @@ raw tables (curated domains, TFRegDB1, HT screens, Lambert, CIS-BP)
  04/05 isoform dataset + domain projection across isoforms
       |
       v
- 13 assemble per-TF records -> curation overlays -> aggregates
+ 12 assemble per-TF records -> curation overlays -> aggregates
       ^   (branches below run in parallel and feed the per-TF records)
       |-- 06 structure        (AlphaFold, DSSP, pLDDT, PAE)      [HPC]
       |-- 07 predictors       (ADpred, PADDLE)
       |-- 08 features         (SLiMs / ELM)
       |-- 09 genomic          (fastCDS exon-intron structure)
       |-- 10 conservation     (phyloP, ConSurf)                 [HPC]
-      |-- 11 interactions     (finches IDR)                     [HPC]
-      |-- 12 variants         (ClinVar, COSMIC, gnomAD)
+      |-- 11 variants         (ClinVar, COSMIC, gnomAD)
 ```
 
 | Stage | What it does | Where |
@@ -46,11 +45,10 @@ raw tables (curated domains, TFRegDB1, HT screens, Lambert, CIS-BP)
 | 08 features | Short linear motifs (ELM) | local |
 | 09 genomic | Exon-intron structure with fastCDS | local |
 | 10 conservation | phyloP tracks and per-isoform ConSurf | HPC + local |
-| 11 interactions | finches IDR interaction maps | HPC + local |
-| 12 variants | ClinVar / COSMIC / gnomAD, projected to domains | local |
-| 13 assemble | Build per-TF records, apply curation, build aggregates | local |
+| 11 variants | ClinVar / COSMIC / gnomAD, projected to domains | local |
+| 12 assemble | Build per-TF records, apply curation, build aggregates | local |
 
-The three HPC stages (structure, ConSurf, finches) ran on an SGE cluster; their
+The two HPC stages (structure and ConSurf) ran on an SGE cluster; their
 job scripts and environment are described in `scc/README.md`.
 
 ## Running it

@@ -20,7 +20,6 @@ those through `config/config.yaml` before running elsewhere.
 | ELM database | release 1.4 | 08 | short linear motif classes |
 | fastCDS | 2.2.0 | 09 | exon-intron structure (C++ tool) |
 | ConSurf (standalone) | HMMER algorithm | 10 | per-isoform conservation, on HPC |
-| finches | tool release | 11 | IDR interaction epsilon matrices |
 
 ## Reference datasets
 
