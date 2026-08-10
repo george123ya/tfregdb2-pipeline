@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.svg">
+    <img alt="TFRegDB v2.0" src="assets/logo-light.svg" width="300">
+  </picture>
+</p>
+
 # TFRegDB v2.0 pipeline
 
 The curation and annotation pipeline behind TFRegDB v2.0, a database of human
