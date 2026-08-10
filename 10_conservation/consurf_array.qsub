@@ -1,0 +1,38 @@
+#!/bin/bash -l
+# Per-isoform ConSurf conservation grades. SGE array, one task per input FASTA
+# (the distinct non-canonical isoform sequences from make_consurf_isoform_inputs.py).
+# Set CONSURF_BASE to the ConSurf working dir on the cluster before submitting.
+#$ -P <PROJECT>
+#$ -N consurf_iso
+#$ -pe omp 4
+#$ -l mem_per_core=8G
+#$ -l h_rt=1:30:00
+#$ -t 1-4820
+#$ -tc 100
+#$ -j y
+#$ -o logs/
+
+BASE_DIR=${CONSURF_BASE:?set CONSURF_BASE to the ConSurf working dir}
+CONSURF_DIR="$BASE_DIR/stand_alone_consurf"
+INPUT_DIR="$BASE_DIR/consurf_isoforms/inputs"
+OUTPUT_DIR="$BASE_DIR/consurf_isoforms/outputs"
+SCORES_DIR="$BASE_DIR/consurf_isoforms/conservation_scores"
+mkdir -p "$OUTPUT_DIR" "$SCORES_DIR" logs
+
+conda activate consurf
+cd "$CONSURF_DIR"
+
+FASTA_FILES=("$INPUT_DIR"/*.fasta)
+FASTA="${FASTA_FILES[$((SGE_TASK_ID - 1))]}"
+NAME=$(basename "$FASTA" .fasta)
+OUT="$OUTPUT_DIR/${NAME}_analysis"
+mkdir -p "$OUT"
+
+python3 stand_alone_consurf.py \
+    --algorithm HMMER --MAX_HOMOLOGS 150 --MAX_ID 95 --MIN_ID 35 \
+    --cutoff 0.0001 --iterations 1 \
+    --seq "$FASTA" --dir "$OUT/" \
+    --DB "$CONSURF_DIR/databases/uniref90.fasta"
+
+# Flatten the grades file for parse_consurf_isoforms.py.
+[ $? -eq 0 ] && cp "$OUT/no_model_consurf_grades.txt" "$SCORES_DIR/${NAME}_scores.txt"

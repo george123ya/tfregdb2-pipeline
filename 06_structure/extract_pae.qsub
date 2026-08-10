@@ -1,0 +1,19 @@
+#!/bin/bash -l
+# Pull the top model's PAE matrix from AlphaFold's result_*.pkl and stage it
+# next to the PDBs. Chunked array: each task handles every NCHUNK-th target,
+# which keeps scheduler overhead low for a large, fast job. Safe to re-run
+# (extract_pae.py skips targets already staged).
+#$ -P <PROJECT>
+#$ -N af2_pae
+#$ -pe omp 4
+#$ -l mem_per_core=8G
+#$ -l h_rt=4:00:00
+#$ -t 1-24
+#$ -tc 24
+
+BASE=${PIPELINE_DIR:?set PIPELINE_DIR to the fold-targets dir}
+NCHUNK=24
+IDS=$(awk -v t="$SGE_TASK_ID" -v n="$NCHUNK" 'NR % n == t % n' "$BASE/pae_targets.txt")
+
+# Uses the AlphaFold environment's python (it already provides numpy).
+python "$BASE/extract_pae.py" $IDS

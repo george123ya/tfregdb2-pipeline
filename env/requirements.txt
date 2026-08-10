@@ -1,0 +1,20 @@
+# Python packages used across the pipeline stages.
+# Versions are pinned where the release depended on them; the rest track the
+# latest compatible release at build time.
+biopython==1.87
+metapub==0.6.4
+pandas>=2.0
+numpy
+openpyxl>=3.1
+requests
+pyarrow
+pyBigWig
+gemmi
+
+# Stage 06/07 (structure, predictors) use TensorFlow-based models in their own
+# conda environments; see env/EXTERNAL_TOOLS.md.
+#   ADpred   - Keras / TensorFlow
+#   PADDLE   - TensorFlow 2.20 (SavedModels)
+#
+# External binaries (not pip-installable): NCBI BLAST+, mkdssp 4, AlphaFold 2.3.1,
+# ConSurf standalone, fastCDS.

@@ -1,0 +1,27 @@
+#!/bin/bash -l
+# AlphaFold 2.3.1, stage 1: build the MSA / feature file on CPU.
+# SGE array; one task per sequence ID listed in order.txt.
+# Set PIPELINE_DIR to the fold-targets directory on the cluster before submitting.
+#$ -P <PROJECT>
+#$ -N af2_features
+#$ -pe omp 8
+#$ -l mem_per_core=8G
+#$ -l h_rt=12:00:00
+#$ -t 1-475
+#$ -tc 30
+#$ -o logs/features/
+#$ -e logs/features_err/
+
+module load miniconda
+module load alphafold/2.3.1
+
+BASE=${PIPELINE_DIR:?set PIPELINE_DIR to the fold-targets dir}
+OUT=$BASE/af2_output
+ID=$(sed -n "${SGE_TASK_ID}p" "$BASE/order.txt")
+FASTA="$BASE/fastas/${ID}.fasta"
+
+# Skip if a complete feature file already exists (safe to re-run).
+[ -s "$OUT/${ID}/features.pkl" ] && { echo "features.pkl exists for $ID"; exit 0; }
+
+# full_dbs must match the inference stage so the cached MSA is reused there.
+run_alphafold.sh -i "$FASTA" -o "$OUT" -p monomer_ptm -c full_dbs -f

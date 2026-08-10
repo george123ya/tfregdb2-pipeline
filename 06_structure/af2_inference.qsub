@@ -1,0 +1,43 @@
+#!/bin/bash -l
+# AlphaFold 2.3.1, stage 2: GPU inference, reusing the stage-1 feature file.
+# The array count matches af2_features so -hold_jid_ad waits per task.
+#
+# Proteins over ~2700 aa need an A100-80G and more walltime: submit those with
+# gpu_type=A100, a longer h_rt, and drop -G so the relax step runs on the GPU.
+#$ -P <PROJECT>
+#$ -N af2_inference
+#$ -pe omp 6
+#$ -l mem_per_core=8G
+#$ -l gpus=1
+#$ -l gpu_type=L40S
+#$ -l h_rt=10:00:00
+#$ -t 1-475
+#$ -tc 12
+#$ -hold_jid_ad af2_features
+#$ -o logs/inference/
+#$ -e logs/inference_err/
+
+module load miniconda
+module load cuda/11.8
+module load alphafold/2.3.1
+
+# Allow the model to spill onto host RAM for the larger proteins.
+export TF_FORCE_UNIFIED_MEMORY=1
+export XLA_PYTHON_CLIENT_MEM_FRACTION=2.0
+
+BASE=${PIPELINE_DIR:?set PIPELINE_DIR to the fold-targets dir}
+OUT=$BASE/af2_output
+ID=$(sed -n "${SGE_TASK_ID}p" "$BASE/order.txt")
+FASTA="$BASE/fastas/${ID}.fasta"
+
+[ -f "$OUT/${ID}/ranked_0.pdb" ] && { echo "$ID already folded"; exit 0; }
+
+# Stop if the MSA is missing; never run the MSA on the GPU.
+if [ ! -s "$OUT/${ID}/features.pkl" ]; then
+  echo "ERROR: features.pkl missing for $ID (stage 1 incomplete)" >&2
+  exit 1
+fi
+
+# -g: GPU inference.  -G: run the AMBER relax on CPU (the L40S cannot JIT it).
+# -t: template cutoff date.  -r best: relax the top-ranked model.
+run_alphafold.sh -i "$FASTA" -o "$OUT" -p monomer_ptm -t 2022-04-14 -g -G -c full_dbs -r best

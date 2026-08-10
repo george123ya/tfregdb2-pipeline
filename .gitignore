@@ -1,0 +1,11 @@
+output/
+__pycache__/
+*.pyc
+.env
+*.log
+# large inputs and intermediates stay out of git
+models/
+data/phylop/
+*.idx
+*.pkl
+*.pkl.gz

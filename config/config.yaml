@@ -1,0 +1,31 @@
+# Edit these for your machine. Several scripts currently hardcode paths and conda
+# environment names; those are being moved here.
+
+paths:
+  # Curated tables and reference bundle (see data/DATA_SOURCES.md).
+  source_tables: ../tfregdb_source/tables
+  # Where per-TF records and the index are written.
+  output: ./output
+  # External binaries / model directories.
+  blast_bin: blastp
+  mkdssp_bin: mkdssp
+  paddle_models: ./models/PADDLE_noSS      # PADDLE_noSS_split0..9.model
+  phylop_dir: ./data/phylop                # cactus241way + hg38.phyloP470way bigWigs
+  fastcds_index: ./data/human_v49.idx      # GENCODE v49
+
+# Domain-mapping thresholds.
+thresholds:
+  # Humanization: map a curated domain (often non-human) to the canonical human
+  # protein by BLASTp best hit. blastp is run permissive so short domains are not
+  # masked out: -evalue 1000 -seg no -comp_based_stats F -max_target_seqs 1
+  humanize_identity: 95     # percent; best hits below this are dropped
+  humanize_coverage: 100    # percent; stated in the methods (the projector does
+                            # not currently enforce a coverage gate - see stage 03)
+
+  # Isoform projection: carry a canonical domain onto each alternative isoform.
+  isoform_identity: 100     # percent
+  isoform_coverage: 95      # percent; planned change to 100 for the final version
+
+curation:
+  # OpenAI model snapshot used for article triage and extraction (stage 01).
+  llm_model: gpt-5-mini-2025-08-07
