@@ -9,8 +9,8 @@ echo "01 curation      - manual for now (see 01_curation/README.md)"
 echo "02 ht_screens    - parse the four high-throughput screens"
 #   python 02_ht_screens/assemble_from_master.py
 
-echo "03 humanization  - BLAST curated domains onto canonical human proteins"
-#   cd 03_humanization && make            # enrich -> fetch-animals -> db -> queries -> blast -> project
+echo "03 canonical mapping  - BLAST curated domains onto canonical human proteins"
+#   cd 03_canonical_mapping && make            # enrich -> fetch-animals -> db -> queries -> blast -> project
 
 echo "04/05 projection - isoform dataset + project domains + CIS-BP DBDs"
 #   python 05_projection/map_canonical_to_isoforms.py

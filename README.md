@@ -24,7 +24,7 @@ branches that all feed the per-TF records assembled in stage 12.
 raw tables: curated domains, TFRegDB1, HT screens, Lambert, CIS-BP
       |
       v
- 03 humanization              BLAST curated domains to the canonical human protein
+ 03 canonical mapping         BLAST curated domains to the canonical human protein
       |
       v
  04 isoforms + 05 projection  project domains across all isoforms; add CIS-BP DBDs
@@ -45,7 +45,7 @@ raw tables: curated domains, TFRegDB1, HT screens, Lambert, CIS-BP
 | --- | --- | --- |
 | 01 curation | PubMed query + LLM triage + manual review (placeholder) | local |
 | 02 ht_screens | Parse the four high-throughput screens | local |
-| 03 humanization | BLAST curated domains onto the canonical human protein | local |
+| 03 canonical mapping | BLAST curated domains onto the canonical human protein | local |
 | 04 isoforms | Isoform repertoire from APPRIS / Ensembl / UniProt | local |
 | 05 projection | Project domains onto all isoforms; add CIS-BP DBDs | local |
 | 06 structure | AlphaFold models, pLDDT, PAE, secondary structure | HPC + local |
@@ -59,6 +59,23 @@ raw tables: curated domains, TFRegDB1, HT screens, Lambert, CIS-BP
 The two HPC stages (structure and ConSurf) ran on an SGE cluster; their
 job scripts and environment are described in `scc/README.md`.
 
+## What you need to start
+
+Only the mapping stage (03) needs external input files; later stages read what
+earlier ones produce. To run from stage 03 onward you need:
+
+- **Curated tables** (distributed with the release): `UpdatedTable.xlsx` (or
+  `HumanizedTable.xlsx` + `TFRegDB1.xlsx`) with the effector-domain reports and
+  the high-throughput study sheets.
+- **`TF_completeIDs_with_ensembl_canonical.csv`** — the gene to canonical
+  Ensembl protein lookup.
+- **`human_proteome.fasta`** — UniProt Swiss-Prot human, for the BLAST database.
+- **`TF_dbd_data_.xlsx`** — CIS-BP DNA-binding domains.
+
+The public reference datasets each stage pulls (APPRIS, Ensembl, CIS-BP,
+AlphaFold, ELM, phyloP, ClinVar/COSMIC/gnomAD) and where to get them are listed
+in `data/DATA_SOURCES.md`.
+
 ## Running it
 
 1. Create the environment and install external tools: see `env/`.
@@ -67,6 +84,17 @@ job scripts and environment are described in `scc/README.md`.
 4. Work through the stages in order; `run_all.sh` documents the sequence. Several
    stages are long-running or run on the cluster, so the pipeline is meant to be
    run stage by stage rather than end to end in one command.
+
+## Updating the database
+
+When the curated table changes (for example when the remaining rows are curated),
+point `RECUR_XLSX` and the source tables at the new files and run:
+
+    bash update.sh
+
+It re-maps the domains, rebuilds the per-TF records, re-applies the curation
+overlay, rebuilds the aggregates, and prints the publish step. The annotation
+branches (06-11) only need re-running if new TFs or isoforms were added.
 
 ## Notes
 
