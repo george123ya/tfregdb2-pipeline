@@ -10,27 +10,28 @@ repository (github.com/george123ya/tfregdb2).
 
 ## Pipeline
 
-Each numbered folder is one stage. Stages 06-12 are independent branches that all
-feed the per-TF records assembled in stage 13.
+Each numbered folder is one stage. Stages 06-11 are independent annotation
+branches that all feed the per-TF records assembled in stage 12.
 
 ```
-raw tables (curated domains, TFRegDB1, HT screens, Lambert, CIS-BP)
+raw tables: curated domains, TFRegDB1, HT screens, Lambert, CIS-BP
       |
       v
- 03 humanization (BLAST to canonical human protein) -> Unified_Valid_Domains
+ 03 humanization              BLAST curated domains to the canonical human protein
       |
       v
- 04/05 isoform dataset + domain projection across isoforms
+ 04 isoforms + 05 projection  project domains across all isoforms; add CIS-BP DBDs
+      |
+      |  annotation branches (independent, run in parallel):
+      +-- 06 structure         AlphaFold, DSSP, pLDDT, PAE         [HPC]
+      +-- 07 predictors        ADpred, PADDLE
+      +-- 08 features          short linear motifs (ELM)
+      +-- 09 genomic           fastCDS exon-intron structure
+      +-- 10 conservation      phyloP, ConSurf                     [HPC]
+      +-- 11 variants          ClinVar, COSMIC, gnomAD
       |
       v
- 12 assemble per-TF records -> curation overlays -> aggregates
-      ^   (branches below run in parallel and feed the per-TF records)
-      |-- 06 structure        (AlphaFold, DSSP, pLDDT, PAE)      [HPC]
-      |-- 07 predictors       (ADpred, PADDLE)
-      |-- 08 features         (SLiMs / ELM)
-      |-- 09 genomic          (fastCDS exon-intron structure)
-      |-- 10 conservation     (phyloP, ConSurf)                 [HPC]
-      |-- 11 variants         (ClinVar, COSMIC, gnomAD)
+ 12 assemble                  one record per TF, curation overlays, build aggregates
 ```
 
 | Stage | What it does | Where |

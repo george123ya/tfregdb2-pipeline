@@ -10,7 +10,6 @@ Outputs → public/downloads/ (then synced to R2 v1/downloads/ by upload_r2.sh):
   effector_domains.tsv        all curated AD/RD/Bif + DBD domains
   ptms.tsv                    all PTM sites (+ which curated domain they hit)
   variants_in_domains.csv.gz  in-domain ClinVar + COSMIC variants
-  interactions.tsv            finches IDR partners + ε, all TFs
   tfs_json.tgz                every per-TF JSON profile
   README.txt
 """
@@ -26,7 +25,6 @@ from pathlib import Path
 
 OUT = Path("public/downloads")
 API = Path("public/mock/api")
-INTER = Path("public/interactions")
 TFS = Path("public/mock/tfs")
 VAR_CSV = Path("data/variants/api_in_domains.csv")
 
@@ -66,32 +64,14 @@ def main() -> int:
             shutil.copyfileobj(src, dst)
         print(f"  variants_in_domains.csv.gz · {(OUT / 'variants_in_domains.csv.gz').stat().st_size/1e6:.1f} MB")
 
-    # 4. Interactions — flatten every per-TF file.
-    irows = []
-    for fp in sorted(INTER.glob("*.json")):
-        try:
-            d = json.loads(fp.read_text())
-        except Exception:
-            continue
-        if not isinstance(d, dict) or "idrs" not in d:
-            continue
-        for idr in d.get("idrs") or []:
-            for p in idr.get("partners") or []:
-                irows.append([d.get("tf"), idr.get("id"), idr.get("start"), idr.get("end"),
-                              p.get("uniprot"), p.get("name"), p.get("mean"), p.get("max"), p.get("std")])
-    write_tsv(OUT / "interactions.tsv",
-              ["tf", "idr", "idr_start", "idr_end", "partner_uniprot", "partner_name", "epsilon_mean", "epsilon_max", "epsilon_std"],
-              irows)
-    print(f"  interactions.tsv · {len(irows):,} TF–partner pairs")
-
-    # 5. Per-TF JSON bundle.
+    # 4. Per-TF JSON bundle.
     subprocess.run(["tar", "czf", str(OUT / "tfs_json.tgz"), "-C", str(TFS.parent), TFS.name], check=True)
     print(f"  tfs_json.tgz · {(OUT / 'tfs_json.tgz').stat().st_size/1e6:.1f} MB")
 
     (OUT / "README.txt").write_text(
         "TFRegDB2 bulk downloads (CC-BY-4.0)\n"
         "===================================\n\n"
-        "effector_domains.tsv        Curated AD/RD/Bifunctional effector + CIS-BP 2.0 DNA-binding domains.\n"
+        "effector_domains.tsv        Curated AD/RD/Bifunctional effector + CIS-BP 3.0 DNA-binding domains.\n"
         "                            Columns: domain_id, symbol, uniprot, ensp, type, subtype, family,\n"
         "                            tf_family, start, end, length, confidence, pmid, year.\n"
         "ptms.tsv                    PTM sites; in_domain flags whether the site lies in a curated domain.\n"
@@ -99,7 +79,6 @@ def main() -> int:
         "                            (gnomAD excluded — see the TF pages / API). Columns: gene, uniprot,\n"
         "                            pos, aa_ref, aa_alt, consequence, source, clin_sig, af, count,\n"
         "                            domain_id, domain_type, domain_subtype, family, tf_family.\n"
-        "interactions.tsv            finches IDR-mediated partners with mean/max/std epsilon (eps<0 attractive).\n"
         "tfs_json.tgz                Every per-TF JSON profile (full payload behind each /tf/{SYMBOL} page).\n\n"
         "For custom slices, query the API: https://tfregdb2.kamluwantan.com/api/v1/docs\n"
         "AlphaFold PDB / PAE / per-residue conservation are large; fetch individually via the API\n"
